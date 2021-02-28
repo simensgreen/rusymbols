@@ -1,10 +1,13 @@
 [package]
 name = "rusymbols"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["simens_green <simensgreen007@gmail.com>"]
 edition = "2018"
 description = "rusymbols is a Rust crate for symbolic mathematics. It aims to become a full-featured computer algebra system (CAS) while keeping the code as simple as possible in order to be comprehensible and easily extensible. rusymbols is written entirely in Rust."
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/simensgreen/rusymbols/tree/main"
+readme = "README.MD"
+keywords = ["symbols", "calculations", "formulas"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
