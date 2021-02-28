@@ -51,17 +51,50 @@ pub struct Expression {
 
 /// Associated functions
 impl Expression {
+    /// New `Expression` constructor
+    /// #### Example
+    /// ```
+    /// use rusymbols::{core, Expression};
+    /// let x = Expression::new_var("x"); // new 'x' variable creation
+    /// let two = Expression::new_val(2.0); // new 2.0 value creation
+    /// let expr = Expression::new(x, two, core::Actions::Mul); // new expression creation
+    ///
+    /// assert_eq!(expr.to_string(), "x * 2")
+    /// ```
     pub fn new(left: Expression, right: Expression, kind: Actions) -> Expression {
         Expression{ args: vec![left, right], kind}
     }
 
-    /// New `Expression` with variable literal
+    /// New `Expression` constructor with variable literal
+    /// #### Example
+    /// ```
+    /// use rusymbols::{core, Expression};
+    /// let x = Expression::new_var("x"); // new 'x' variable creation
+    /// let y = Expression::new_var("y"); // new 'y' value creation
+    /// let expr = x / y;
+    ///
+    /// assert_eq!(expr.to_string(), "x / y")
+    /// ```
     pub fn new_var(literal: &str) -> Expression {
         Expression { args: vec![], kind: Actions::Var(String::from(literal)) }
     }
 
 
-    /// New `Expression` with numeric value
+    /// New `Expression` constructor with numeric value
+    /// #### Example
+    /// ```
+    /// use rusymbols::{core, Expression};
+    /// use std::collections::HashMap;
+    ///
+    /// let ten = Expression::new_val(10.0); // new 'x' variable creation
+    /// let two = Expression::new_val(2.0); // new 2.0 value creation
+    /// let expr = ten * two; // new expression creation
+    /// let args: HashMap<&str, f64> = HashMap::new();
+    ///
+    /// assert_eq!(expr.to_string(), "10 * 2");
+    /// assert_eq!(expr.eval_args(&args).unwrap(), 20.0);
+    ///
+    /// ```
     pub fn new_val(value: f64) -> Expression {
         Expression { args: vec![], kind: Actions::Val(value) }
     }
@@ -77,18 +110,44 @@ impl Expression {
 impl Expression {
 
     /// Wraps the given `Expression` with the specified parentheses
+    /// #### Example
+    /// ```
+    /// use rusymbols::Expression;
+    /// use rusymbols::core::Brackets;
+    /// let x = Expression::new_var("x");
+    /// let expr = x.brackets(Brackets::Square);
+    ///
+    /// assert_eq!(expr.to_string(), "[x]")
+    /// ```
     #[inline]
     pub fn brackets(self, brackets: core::Brackets) -> Expression {
         Expression::new_brackets(self, brackets)
     }
 
     /// Wraps the given `Expression` with the round brackets
+    /// #### Example
+    /// ```
+    /// use rusymbols::Expression;
+    /// let x = Expression::new_var("x");
+    /// let expr = x.brackets_round();
+    ///
+    /// assert_eq!(expr.to_string(), "(x)")
+    /// ```
     #[inline]
     pub fn brackets_round(self) -> Expression {
         self.brackets(core::Brackets::Round)
     }
 
     /// Raises an `Expression` to a specified power
+    /// #### Example
+    /// ```
+    /// use rusymbols::Expression;
+    /// let x = Expression::new_var("x");
+    /// let y = Expression::new_var("y");
+    /// let expr = x.pow(y);
+    ///
+    /// assert_eq!(expr.to_string(), "x**y")
+    /// ```
     pub fn pow(mut self, mut rhs: Self) -> Self {
         if self.kind < Actions::Pow { self = self.brackets_round() };
         if rhs.kind < Actions::Pow { rhs = rhs.brackets_round() };
@@ -98,7 +157,7 @@ impl Expression {
 
     /// Wraps the given `Expression` with parentheses if the given `Actions` has a higher priority
     #[inline(always)]
-    fn brace_if(mut self, target: Actions) -> Self {
+    fn brace_if(self, target: Actions) -> Self {
         if self.kind < target { self.brackets_round() }
         else { self }
     }
@@ -109,10 +168,8 @@ impl Expression {
     /// Tries to get the numeric value of an `Expression` by replacing
     /// variables with values from a `HashMap`
     ///
-    /// ## Option:
-    ///     - Some(f64) if all expressions can be evaluated
-    ///     - None if the expression cannot be evaluated
-    ///       (e.g. insufficient variable values were passed)
+    /// Returns None if the expression cannot be evaluated (e.g. insufficient variable values were passed)
+    ///
     /// # Usage
     /// ```edition2018
     /// const LITERAL_X: &str = "x";
@@ -129,29 +186,28 @@ impl Expression {
     /// let y = Expression::new_var(LITERAL_Y);
     /// let expr = x * y;
     ///
-    /// assert_eq!(expr.eval(&args).unwrap(), 4.0);
+    /// assert_eq!(expr.eval_args(&args).unwrap(), 4.0);
     /// ```
-    pub fn eval(&self, vars: &HashMap<&str, f64>) -> Option<f64> {
-        println!("{} :: {:?}", self, self);
+    pub fn eval_args(&self, args: &HashMap<&str, f64>) -> Option<f64> {
         match &self.kind {
             Actions::Val(value) => Some(value.clone()),
-            Actions::Var(var) => Some(vars.get(var.as_str())?.clone()),
-            Actions::Add => Some(self.args[0].eval(vars)? + self.args[1].eval(vars)?),
-            Actions::Mul => Some(self.args[0].eval(vars)? * self.args[1].eval(vars)?),
-            Actions::Pow => Some(self.args[0].eval(vars)?.powf(self.args[1].eval(vars)?)),
-            Actions::Brackets(expr, _) => expr.eval(vars),
+            Actions::Var(var) => Some(args.get(var.as_str())?.clone()),
+            Actions::Add => Some(self.args[0].eval_args(args)? + self.args[1].eval_args(args)?),
+            Actions::Mul => Some(self.args[0].eval_args(args)? * self.args[1].eval_args(args)?),
+            Actions::Pow => Some(self.args[0].eval_args(args)?.powf(self.args[1].eval_args(args)?)),
+            Actions::Brackets(expr, _) => expr.eval_args(args),
             Actions::Div => {
                 let denominator = Expression::new(self.args[1].clone(),
                                                   Expression::new_val(-1.0),
                                                   Actions::Pow);
                 Expression::new(self.args[0].clone(),
                                 denominator,
-                                Actions::Mul).eval(vars)
+                                Actions::Mul).eval_args(args)
             },
             Actions::Sub => {
                 Expression::new(self.args[0].clone(),
                                 -self.args[1].clone(),
-                                Actions::Add).eval(vars)
+                                Actions::Add).eval_args(args)
             }
         }
     }
@@ -210,7 +266,7 @@ impl ops::Div for Expression {
 impl ops::Neg for Expression {
     type Output = Expression;
 
-    fn neg(mut self) -> Self::Output {
+    fn neg(self) -> Self::Output {
         Expression::new(self, Expression::new_val(-1.0), Actions::Mul)
     }
 }

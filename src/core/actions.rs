@@ -46,11 +46,11 @@ impl Default for Actions {
 impl fmt::Display for Actions {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> Result<(), fmt::Error> {
         match self {
-            Actions::Add => f.write_str(SYMBOL_ADD),
-            Actions::Mul => f.write_str(SYMBOL_MUL),
-            Actions::Pow => f.write_str(SYMBOL_POW),
-            Actions::Div => f.write_str(SYMBOL_DIV),
-            Actions::Sub => f.write_str(SYMBOL_SUB),
+            Actions::Add => f.write_str(literals::SYMBOL_ADD),
+            Actions::Mul => f.write_str(literals::SYMBOL_MUL),
+            Actions::Pow => f.write_str(literals::SYMBOL_POW),
+            Actions::Div => f.write_str(literals::SYMBOL_DIV),
+            Actions::Sub => f.write_str(literals::SYMBOL_SUB),
             Actions::Var(literal) => f.write_str(&literal),
             Actions::Val(value) => f.write_str(&value.to_string()),
             Actions::Brackets(expr, brackets) => {
