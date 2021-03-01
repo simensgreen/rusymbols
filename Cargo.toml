@@ -1,6 +1,6 @@
 [package]
 name = "rusymbols"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["simens_green <simensgreen007@gmail.com>"]
 edition = "2018"
 description = "rusymbols is a Rust crate for symbolic mathematics. It aims to become a full-featured computer algebra system (CAS) while keeping the code as simple as possible in order to be comprehensible and easily extensible. rusymbols is written entirely in Rust."
@@ -11,3 +11,4 @@ keywords = ["symbols", "calculations", "formulas"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+dyn-clonable = "0.9.0"

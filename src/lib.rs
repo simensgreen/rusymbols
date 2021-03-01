@@ -27,9 +27,16 @@ pub mod core;
 
 #[cfg(test)]
 mod tests {
-    use crate::core;
+    use crate::core::*;
+    use std::collections::HashMap;
+
     #[test]
     fn foo() {
-
+        let x = Variable::new("x");
+        let mut expr = Add::new(Box::new(x.clone()), Box::new(x.clone() + x.clone()));
+        // expr.brace();
+        let mut args = HashMap::new();
+        args.insert("x", 10.0);
+        println!("{}", expr)
     }
 }
