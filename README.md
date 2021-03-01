@@ -1,4 +1,7 @@
 # rusymbols
+# Note:
+The resulting crate architecture does not correspond to the main ideas, therefore it will be reviewed and reassembled. 
+Please wait for a more stable version
  ## About
 
  rusymbols is a Rust crate for symbolic mathematics. It aims to become a full-featured computer
