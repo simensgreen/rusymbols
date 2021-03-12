@@ -1,6 +1,7 @@
 use std::{ops, fmt, collections::HashMap};
 use crate::core::actions::*;
 use crate::core::expression::*;
+use crate::core::Brackets;
 
 #[derive(Clone, Debug)]
 pub struct Variable {
@@ -14,6 +15,11 @@ impl Expression for Variable {
     fn eval_args(&self, args: &HashMap<&str, f64>) -> Option<f64> {
         Some(args.get(self.literal.as_str())?.clone())
     }
+
+    fn braced(self) -> Brackets {
+        Brackets::new_round(Box::new(self.clone()))
+    }
+
     fn is_action(&self) -> bool { false }
     fn is_variable(&self) -> bool { true }
     fn priority(&self) -> u8 { 1 }

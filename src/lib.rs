@@ -33,10 +33,12 @@ mod tests {
     #[test]
     fn foo() {
         let x = Variable::new("x");
-        let mut expr = Add::new(Box::new(x.clone()), Box::new(x.clone() + x.clone()));
+        let mut expr = Add::new(Box::new(x.clone()), Box::new(x.clone()));
         // expr.brace();
+        expr = expr + x;
         let mut args = HashMap::new();
         args.insert("x", 10.0);
-        println!("{}", expr)
+        println!("{}", expr);
+        println!("{}", expr.eval_args(&args).unwrap());
     }
 }
