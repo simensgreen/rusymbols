@@ -54,3 +54,9 @@ impl ops::Mul for Variable {
     type Output = Mul;
     fn mul(self, rhs: Self) -> Self::Output { Mul::new(Box::new(self), Box::new(rhs)) }
 }
+
+impl PartialEq for Variable {
+    fn eq(&self, other: &Self) -> bool {
+        self.literal == other.literal
+    }
+}
