@@ -20,16 +20,26 @@
 //! # How to use
 //!     Just use it! The main idea is simplicity. Enjoy!
 //! ## Example
+//! ```rust
+//! use rusymbols::*;
+//! use std::collections::HashMap;
+//!
+//! let z = Variable("z");
+//! let expr = X.pow(Y).add(TWO).mul(z).sub(Value(10.0));
+//! let vars =
+//! {
+//!     let mut tmp = HashMap::new();
+//!     tmp.insert(X, 10.0);
+//!     tmp.insert(Y, 3.0);
+//!     tmp.insert(z, 5.0);
+//!     tmp
+//! };
+//!
+//! assert_eq!(expr.to_string(), "(x ^ y + 2) * z - 10");
+//! assert_eq!(expr.eval_vars(&vars), 5000.0);
+//!
 //! ```
-//! ```
 
-pub mod core;
+mod core;
 
-#[cfg(test)]
-mod tests {
-    use crate::core;
-    #[test]
-    fn foo() {
-
-    }
-}
+pub use crate::core::*;
